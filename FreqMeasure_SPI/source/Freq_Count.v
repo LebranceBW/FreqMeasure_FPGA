@@ -28,10 +28,10 @@ module freqMeasure_Mod(baseClk,sigClk,data,sendEnable,sendBusy,hard_Clr,Status,e
 	reg[31:0] baseCount;
 	reg sendEnable;
 	reg[7:0] data;
-	reg[5:0] sigCount; //基准时钟计数器，测试信号计数器
+	reg[8:0] sigCount; //基准时钟计数器，测试信号计数器
 	reg baseOvf,sigOvf;//允许计数信号与溢出信号
-	reg soft_Clr,enable;
-
+	reg enable;
+	wire soft_Clr;
 	assign clr = soft_Clr | hard_Clr; //外部复位与内部复位
 	
 	assign Ovf = baseOvf | sigOvf;
@@ -52,19 +52,19 @@ module freqMeasure_Mod(baseClk,sigClk,data,sendEnable,sendBusy,hard_Clr,Status,e
 	always @(posedge sigClk or posedge clr) //被测信号计数器
 		if(clr)
 			begin
-				sigCount <= 6'd0;
+				sigCount <= 8'd0;
 				sigOvf <= 0;
 			end
-		else if(sigCount == 6'H3F) sigOvf <= 1;
+		else if(sigCount == 8'HFF) sigOvf <= 1;
 		else if((Status == Mer_Status)&&(!Ovf) )
-				sigCount <= sigCount+ 6'd1;
+				sigCount <= sigCount+ 8'd1;
 	
 	always @(posedge sigClk or posedge clr)
 		if(clr)
 				enable <= 1'b0;
 		else if((Status == Mer_Status)&&(!Ovf) )
 				begin
-					if(sigCount <= 6'd16)
+					if(sigCount <= 8'd100)
 						enable <= 1;
 					else
 						enable <= 0;
@@ -94,20 +94,19 @@ module freqMeasure_Mod(baseClk,sigClk,data,sendEnable,sendBusy,hard_Clr,Status,e
 									default: data <= 8'HXX;
 								endcase
 									sendEnable <= 1'b1;
+									count <= count + 3'b1;
 							end
 					end
 				else 
-					begin
-						sendEnable <= 1'b0;
-						count <= count + 3'b1;
-					end
+						sendEnable <= 1'b0;		
 			end
-/*Init_Status*/			
-always @(posedge baseClk)
-	if(Status == Init_Status)
-		soft_Clr = 1'b1;
-	else
-		soft_Clr = 1'b0;
+/*Init_Status*/	
+assign soft_Clr = (Status == Init_Status);		
+//always @(posedge baseClk)
+//	if(Status == Init_Status)
+//		soft_Clr = 1'b1;
+//	else
+//		soft_Clr = 1'b0;
 /*状态机*/	
 	always @(posedge baseClk or posedge hard_Clr)
 		if(hard_Clr)
@@ -116,13 +115,13 @@ always @(posedge baseClk)
 			case(Status)
 				Init_Status:if((sigCount == 6'b000000) && (baseCount == 32'H0000_0000))
 								Status <= Mer_Status;
-				Mer_Status: if(sigCount >= 6'H10)
+				Mer_Status: if(sigCount >= 8'd100)
 									Status <= Send_Status;
 								else if(Ovf)
 									Status <= Err_Status;
 				Send_Status: if((count == 3'b101)&&(!sendBusy))
 								Status <= Init_Status;
-				Err_Status：Status <= Err_Status;
+				Err_Status:Status <= Init_Status;
 				default:Status <= Init_Status;
 			endcase
 endmodule
