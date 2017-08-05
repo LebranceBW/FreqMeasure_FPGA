@@ -18,12 +18,13 @@
 // Additional Comments: 
 //
 //////////////////////////////////////////////////////////////////////////////////
-module freqMeasure_Mod(baseClk,sigClk,data,sendEnable,sendBusy,hard_Clr,Status,enable
+module freqMeasure_Mod(baseClk,sigClk,data,sendEnable,sendBusy,hard_Clr,Status,enable,baseCount
     );
 	input baseClk,sigClk,hard_Clr,sendBusy;
 	output[7:0]data;
 	output sendEnable,enable;
 	output[1:0] Status;
+	output[31:0] baseCount;
 
 	reg[31:0] baseCount;
 	reg sendEnable;
@@ -115,7 +116,7 @@ assign soft_Clr = (Status == Init_Status);
 			case(Status)
 				Init_Status:if((sigCount == 6'b000000) && (baseCount == 32'H0000_0000))
 								Status <= Mer_Status;
-				Mer_Status: if(sigCount >= 8'd100)
+				Mer_Status: if((!enable)&&(sigCount >= 8'd100))
 									Status <= Send_Status;
 								else if(Ovf)
 									Status <= Err_Status;

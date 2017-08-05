@@ -71,6 +71,6 @@ module top_mod_test;
 always 
 	#5 clk = !clk;
 always
-	#500 sigClk = !sigClk;        
+	#20 sigClk = !sigClk;        
 endmodule
 

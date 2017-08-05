@@ -34,6 +34,7 @@ module freq_mod_test;
 	wire [7:0] data;
 	wire sendEnable;
 	wire[1:0] Status;
+	wire[31:0] baseCount;
 	// Instantiate the Unit Under Test (UUT)
 	freqMeasure_Mod uut (
 		.baseClk(baseClk), 
@@ -43,7 +44,8 @@ module freq_mod_test;
 		.sendBusy(sendBusy), 
 		.hard_Clr(hard_Clr),
 		.Status(Status),
-		.enable(enable)
+		.enable(enable),
+		.baseCount(baseCount)
 	);
 
 	initial begin
@@ -63,7 +65,7 @@ module freq_mod_test;
 always 
 	#5 baseClk = !baseClk;
 always
-	#500 sigClk = !sigClk;
+	#20 sigClk = !sigClk;
 always@(posedge sendEnable)
 	begin
 		sendBusy <= 1'b1;
