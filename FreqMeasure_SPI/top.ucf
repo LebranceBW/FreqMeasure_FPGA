@@ -1,0 +1,20 @@
+
+# PlanAhead Generated physical constraints 
+
+NET "clk" LOC = P55;
+NET "CS" LOC = P81;
+NET "MOSI" LOC = P79;
+NET "SCK" LOC = P80;
+NET "rst" LOC = P83;
+# PlanAhead Generated IO constraints 
+
+NET "clk" IOSTANDARD = LVCMOS33;
+NET "CS" IOSTANDARD = LVCMOS33;
+NET "MOSI" IOSTANDARD = LVCMOS33;
+NET "SCK" IOSTANDARD = LVCMOS33;
+NET "sigClk" IOSTANDARD = LVCMOS33;
+NET "rst" IOSTANDARD = LVCMOS33;
+# PlanAhead Generated physical constraints 
+
+NET "sigClk" LOC = P82;
+NET "sigClk" CLOCK_DEDICATED_ROUTE = FALSE;
